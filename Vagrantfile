@@ -74,8 +74,6 @@ Vagrant.configure("2") do |config|
     systemctl start docker
     curl -L https://github.com/docker/compose/releases/download/1.25.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
-    mkdir sql
-    echo "FROM mysql:8.0" > sql/Dockerfile
     mkdir php
     echo "FROM php:7-apache" > php/Dockerfile
     echo "RUN apt-get update && apt-get install -y libzip-dev libicu-dev unzip zlib1g-dev && docker-php-ext-install pdo_mysql mysqli intl zip" >> php/Dockerfile
@@ -90,10 +88,15 @@ Vagrant.configure("2") do |config|
     echo "    depends_on:" >> docker-compose.yml
     echo "      - db" >> docker-compose.yml
     echo "  db:" >> docker-compose.yml
-    echo "    build: ./sql" >> docker-compose.yml
+    echo "    image: mysql" >> docker-compose.yml
+    echo "    command: --default-authentication-plugin=mysql_native_password" >> docker-compose.yml
     echo "    volumes:" >> docker-compose.yml
     echo "      - db_data:/var/lib/mysql" >> docker-compose.yml
     echo "    restart: always" >> docker-compose.yml
+    echo "    environment:" >> docker-compose.yml
+    echo "      MYSQL_ROOT_PASSWORD: example" >> docker-compose.yml
+    echo "    ports:" >> docker-compose.yml
+    echo "      - 3306:3306" >> docker-compose.yml
     echo "volumes:" >> docker-compose.yml
     echo "  db_data: {}" >> docker-compose.yml
     /usr/local/bin/docker-compose up -d

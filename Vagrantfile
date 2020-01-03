@@ -68,11 +68,34 @@ Vagrant.configure("2") do |config|
     yum install -y yum-utils device-mapper-persistent-data lvm2
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
     yum install -y git
+    yum install -y libicu-devel
     yum install -y docker-ce
     systemctl enable docker
     systemctl start docker
-    echo "FROM php:7-apache" > Dockerfile
-    docker build ./ -t php_apache_image
-    docker run -d -p 80:80 -v /vagrant_data/html:/var/www/html --name php_apache_container php_apache_image
+    curl -L https://github.com/docker/compose/releases/download/1.25.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+    mkdir sql
+    echo "FROM mysql:8.0" > sql/Dockerfile
+    mkdir php
+    echo "FROM php:7-apache" > php/Dockerfile
+    echo "RUN apt-get update && apt-get install -y libzip-dev libicu-dev unzip zlib1g-dev && docker-php-ext-install pdo_mysql mysqli intl zip" >> php/Dockerfile
+    echo "version: '3'" > docker-compose.yml
+    echo "services:" >> docker-compose.yml
+    echo "  web:" >> docker-compose.yml
+    echo "    build: ./php" >> docker-compose.yml
+    echo "    ports:" >> docker-compose.yml
+    echo "      - '80:80'" >> docker-compose.yml
+    echo "    volumes:" >> docker-compose.yml
+    echo "      - /vagrant_data/html:/var/www/html" >> docker-compose.yml
+    echo "    depends_on:" >> docker-compose.yml
+    echo "      - db" >> docker-compose.yml
+    echo "  db:" >> docker-compose.yml
+    echo "    build: ./sql" >> docker-compose.yml
+    echo "    volumes:" >> docker-compose.yml
+    echo "      - db_data:/var/lib/mysql" >> docker-compose.yml
+    echo "    restart: always" >> docker-compose.yml
+    echo "volumes:" >> docker-compose.yml
+    echo "  db_data: {}" >> docker-compose.yml
+    /usr/local/bin/docker-compose up -d
   SHELL
 end

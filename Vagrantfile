@@ -76,7 +76,7 @@ Vagrant.configure("2") do |config|
     chmod +x /usr/local/bin/docker-compose
     mkdir php
     echo "FROM php:7-apache" > php/Dockerfile
-    echo "RUN apt-get update && apt-get install -y libzip-dev libicu-dev unzip zlib1g-dev && docker-php-ext-install pdo_mysql mysqli intl zip" >> php/Dockerfile
+    echo "RUN apt-get update && apt-get install -y libzip-dev libicu-dev unzip zlib1g-dev && docker-php-ext-install pdo_mysql mysqli intl zip && a2enmod rewrite" >> php/Dockerfile
     echo "version: '3'" > docker-compose.yml
     echo "services:" >> docker-compose.yml
     echo "  web:" >> docker-compose.yml

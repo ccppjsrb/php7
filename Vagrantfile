@@ -81,6 +81,7 @@ Vagrant.configure("2") do |config|
     echo "services:" >> docker-compose.yml
     echo "  web:" >> docker-compose.yml
     echo "    build: ./php" >> docker-compose.yml
+    echo "    restart: always" >> docker-compose.yml
     echo "    ports:" >> docker-compose.yml
     echo "      - '80:80'" >> docker-compose.yml
     echo "    volumes:" >> docker-compose.yml
